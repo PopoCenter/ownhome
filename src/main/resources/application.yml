@@ -15,3 +15,23 @@ spring:
 
 mybatis:
   mapper-locations: classpath*:mapper/*Mapper.xml
+
+
+
+#server:
+#  port: 80
+#
+#
+#spring:
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/factory_user
+#    username: root
+#    password: cwovEll__
+#  mvc:
+#    view:
+#      suffix: .html
+#      prefix: /
+#
+#mybatis:
+#  mapper-locations: classpath*:mapper/*Mapper.xml
