@@ -1,0 +1,18 @@
+# Maven #
+target/
+
+/logs
+
+# IDEA #
+.idea/
+*.iws
+*.iml
+*.ipr
+*.swp
+
+# Eclipse #
+.settings/
+.classpath
+.project
+
+
