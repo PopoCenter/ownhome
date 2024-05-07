@@ -158,6 +158,7 @@ public class UserController extends BaseController {
 
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
+                logger.info("用户不存在, openId={}", openId);
                 throw new BusinessDefaultException("用户不存在");
             }
 
