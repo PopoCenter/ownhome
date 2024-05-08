@@ -59,7 +59,7 @@ public class CounterController  extends BaseController {
 
     String openId = getOpenId(headers);
     String testToken = headers.getFirst("TOKEN");
-    logger.info("/api/count header test, token={}, openId={}", testToken, openId);
+    logger.info("/api/count header test tag, token={}, openId={}", testToken, openId);
 
 
     Optional<Counter> curCounter = counterService.getCounter(1);

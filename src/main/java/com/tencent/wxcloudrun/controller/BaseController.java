@@ -16,7 +16,7 @@ public abstract class BaseController {
 
 
     public String getOpenId(HttpHeaders headers) {
-        return headers.getFirst("X_WX_OPENID");
+        return headers.getFirst("X-WX-OPENID");
     }
 
 }
