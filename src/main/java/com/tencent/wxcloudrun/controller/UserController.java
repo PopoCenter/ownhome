@@ -134,7 +134,7 @@ public class UserController extends BaseController {
             // TODO: 2024/5/7 check
 
 
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             userIService.register(registerDto, openId);
             return ResponseMessage.success();
         } catch (BusinessDefaultException ue) {
@@ -153,13 +153,13 @@ public class UserController extends BaseController {
     @PostMapping(value = "/userInfo")
     ResponseMessage<UserInfoVo> info(@RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserInfoVo userInfoVo = new UserInfoVo();
 
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 logger.info("用户不存在, openId={}", openId);
-                throw new BusinessDefaultException("用户不存在");
+                return ResponseMessage.fail(ResponseEnum.USER_NOT_EXIST, "用户不存在");
             }
 
             userInfoVo.setUserId(userEntity.getUserId());
@@ -190,7 +190,7 @@ public class UserController extends BaseController {
     @PostMapping(value = "/modify")
     ResponseMessage<?> modify(@RequestBody @Validated(UserModifyDto.Add.class) UserModifyDto modifyDto, @RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
 
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {

@@ -43,7 +43,7 @@ public class TeamController extends BaseController {
     @PostMapping(value = "/create")
     ResponseMessage<?> create(@RequestBody @Validated(TeamCreateDto.Add.class) TeamCreateDto createDto, @RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 throw new BusinessDefaultException("用户不存在");
@@ -69,7 +69,7 @@ public class TeamController extends BaseController {
     @PostMapping(value = "/memberList")
     ResponseMessage<MemberListVo> memberList(@RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 throw new BusinessDefaultException("用户不存在");
@@ -95,7 +95,7 @@ public class TeamController extends BaseController {
     @PostMapping(value = "/join")
     ResponseMessage<?> join(@RequestBody @Validated(TeamJoinDto.Add.class) TeamJoinDto joinDto, @RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 throw new BusinessDefaultException("用户不存在");
@@ -119,7 +119,7 @@ public class TeamController extends BaseController {
     @PostMapping(value = "/modify")
     ResponseMessage<?> modify(@RequestBody @Validated(TeamModifyDto.Add.class) TeamModifyDto modifyDto, @RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 throw new BusinessDefaultException("用户不存在");
@@ -148,7 +148,7 @@ public class TeamController extends BaseController {
     @PostMapping(value = "/exit")
     ResponseMessage<?> exit(@RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 throw new BusinessDefaultException("用户不存在");
@@ -172,7 +172,7 @@ public class TeamController extends BaseController {
     @PostMapping(value = "/dismiss")
     ResponseMessage<?> dismiss(@RequestHeader HttpHeaders headers) {
         try {
-            String openId = headers.getFirst("HTTP_X_WX_OPENID");
+            String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
             if (userEntity == null) {
                 throw new BusinessDefaultException("用户不存在");

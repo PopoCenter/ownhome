@@ -19,7 +19,7 @@ import java.util.List;
  */
 @RestController
 
-public class CounterController {
+public class CounterController  extends BaseController {
 
   final CounterService counterService;
   final Logger logger;
@@ -57,7 +57,7 @@ public class CounterController {
     logger.info("/api/count post request, action: {}", request.getAction());
 
 
-    String openId = headers.getFirst("HTTP_X_WX_OPENID");
+    String openId = getOpenId(headers);
     String testToken = headers.getFirst("TOKEN");
     logger.info("/api/count header test, token={}, openId={}", testToken, openId);
 

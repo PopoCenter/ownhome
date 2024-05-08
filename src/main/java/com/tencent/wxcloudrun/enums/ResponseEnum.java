@@ -33,6 +33,7 @@ public enum ResponseEnum {
     CODE_WRONG(102, "验证码不正确"),
 
 
+    USER_NOT_EXIST(103, "用户不存在"),
 
 
     FAILURE(999, "操作失败"),
