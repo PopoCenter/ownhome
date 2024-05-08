@@ -1,5 +1,6 @@
 package com.tencent.wxcloudrun.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.tencent.wxcloudrun.config.ApiResponse;
@@ -7,10 +8,7 @@ import com.tencent.wxcloudrun.dto.CounterRequest;
 import com.tencent.wxcloudrun.model.Counter;
 import com.tencent.wxcloudrun.service.CounterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -55,8 +53,14 @@ public class CounterController {
    * @return API response json
    */
   @PostMapping(value = "/api/count")
-  ApiResponse create(@RequestBody CounterRequest request) {
+  ApiResponse create(@RequestBody CounterRequest request, @RequestHeader HttpHeaders headers) {
     logger.info("/api/count post request, action: {}", request.getAction());
+
+
+    String openId = headers.getFirst("HTTP_X_WX_OPENID");
+    String testToken = headers.getFirst("TOKEN");
+    logger.info("/api/count header test, token={}, openId={}", testToken, openId);
+
 
     Optional<Counter> curCounter = counterService.getCounter(1);
     if (request.getAction().equals("inc")) {
