@@ -35,6 +35,8 @@ public enum ResponseEnum {
 
     USER_NOT_EXIST(103, "用户不存在"),
 
+    USER_IS_EXIST(104, "用户已注册"),
+
 
     FAILURE(999, "操作失败"),
 

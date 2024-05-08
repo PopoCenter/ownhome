@@ -8,49 +8,53 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
- * 客户
+ * team
  *
  * @author dongdongxie
  * @date 2024/05/07
  */
-@TableName("t_customer")
-public class CustomerEntity {
+@TableName("t_order")
+public class OrderEntity {
 
     /**
-     * 客户id
+     * 团队id
      */
     @TableId(type = IdType.INPUT)
-    private Long customerId;
+    private Long orderId;
+
 
     /**
      * 创建人id
      */
     private Long ownerId;
 
-    /**
-     * 团队id
-     */
-    private Long teamId;
 
     /**
-     * 客户名称
+     * 客户id
      */
-    private String name;
+    private Long customerId;
 
     /**
-     * 客户手机号
+     * 客户地址id
      */
-    private String phone;
+    private Long addressId;
 
     /**
-     * 性别
+     * 订单状态
      */
-    private Integer genderType;
+    private Integer status;
 
     /**
-     * 年龄区间
+     * 预约上门时间
      */
-    private String ageRange;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date visitTime;
+
+
+    /**
+     * 订单备注
+     */
+    private String demo;
 
     /**
      * 创建时间
@@ -65,12 +69,12 @@ public class CustomerEntity {
     private Date updateTime;
 
 
-    public Long getCustomerId() {
-        return customerId;
+    public Long getOrderId() {
+        return orderId;
     }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public Long getOwnerId() {
@@ -81,36 +85,44 @@ public class CustomerEntity {
         this.ownerId = ownerId;
     }
 
-    public String getName() {
-        return name;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
-    public String getPhone() {
-        return phone;
+    public Long getAddressId() {
+        return addressId;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setAddressId(Long addressId) {
+        this.addressId = addressId;
     }
 
-    public Integer getGenderType() {
-        return genderType;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setGenderType(Integer genderType) {
-        this.genderType = genderType;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
-    public String getAgeRange() {
-        return ageRange;
+    public Date getVisitTime() {
+        return visitTime;
     }
 
-    public void setAgeRange(String ageRange) {
-        this.ageRange = ageRange;
+    public void setVisitTime(Date visitTime) {
+        this.visitTime = visitTime;
+    }
+
+    public String getDemo() {
+        return demo;
+    }
+
+    public void setDemo(String demo) {
+        this.demo = demo;
     }
 
     public Date getCreateTime() {
@@ -127,13 +139,5 @@ public class CustomerEntity {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
     }
 }

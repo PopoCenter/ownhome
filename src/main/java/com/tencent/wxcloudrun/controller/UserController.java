@@ -130,11 +130,11 @@ public class UserController extends BaseController {
     ResponseMessage<?> register(@RequestBody @Validated(RegisterDto.Add.class) RegisterDto registerDto, @RequestHeader HttpHeaders headers) {
         try {
 
-            String phone = registerDto.getPhone();
-            // TODO: 2024/5/7 check
-
-
             String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity != null) {
+                return ResponseMessage.fail(ResponseEnum.USER_NOT_EXIST, "用户已注册");
+            }
             userIService.register(registerDto, openId);
             return ResponseMessage.success();
         } catch (BusinessDefaultException ue) {

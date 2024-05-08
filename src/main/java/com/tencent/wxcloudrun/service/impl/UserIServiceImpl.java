@@ -1,6 +1,5 @@
 package com.tencent.wxcloudrun.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,11 +15,11 @@ import com.tencent.wxcloudrun.entity.UserEntity;
 import com.tencent.wxcloudrun.enums.MemberRole;
 import com.tencent.wxcloudrun.enums.YesNoStatus;
 import com.tencent.wxcloudrun.service.UserIService;
+import com.tencent.wxcloudrun.util.CoreStringUtils;
 import com.tencent.wxcloudrun.util.UniqueIdUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,6 @@ public class UserIServiceImpl extends ServiceImpl<UserMapper, UserEntity> implem
     @Resource
     private UserMapper userMapper;
 
-
     @Resource
     private TeamMapper teamMapper;
 
@@ -55,6 +53,17 @@ public class UserIServiceImpl extends ServiceImpl<UserMapper, UserEntity> implem
     @Override
     @Transactional
     public void register(RegisterDto registerDto, String openId) throws BusinessDefaultException {
+        if (!CoreStringUtils.checkChinaMobilePhone(registerDto.getPhone())) {
+            throw new BusinessDefaultException("手机号格式不正确");
+        }
+
+        LambdaQueryWrapper<UserEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserEntity::getPhone, registerDto.getPhone());
+        boolean phoneCheck = userMapper.exists(queryWrapper);
+        if (phoneCheck) {
+            throw new BusinessDefaultException("手机号已注册");
+        }
+
         Long userId = UniqueIdUtils.Millis.uniqueId();
         Date now = new Date();
         UserEntity userEntity = new UserEntity();
