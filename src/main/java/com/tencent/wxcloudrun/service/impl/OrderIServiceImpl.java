@@ -6,8 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
 import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
 import com.tencent.wxcloudrun.dao.*;
-import com.tencent.wxcloudrun.dto.OrderCreateDto;
-import com.tencent.wxcloudrun.dto.OrderListDto;
+import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.*;
 import com.tencent.wxcloudrun.enums.OrderOperateType;
 import com.tencent.wxcloudrun.enums.OrderStatus;
@@ -15,8 +14,8 @@ import com.tencent.wxcloudrun.enums.YesNoStatus;
 import com.tencent.wxcloudrun.service.OrderIService;
 import com.tencent.wxcloudrun.util.CoreDateUtils;
 import com.tencent.wxcloudrun.util.UniqueIdUtils;
-import com.tencent.wxcloudrun.vo.OrderListItemVo;
-import com.tencent.wxcloudrun.vo.OrderListVo;
+import com.tencent.wxcloudrun.vo.OrderDetailVo;
+import com.tencent.wxcloudrun.vo.OrderRecordVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +59,40 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         return null;
     }
 
+
+    private void orderDocumentInit(Long orderId, OrderOperateType operateType, List<String> fileIdList) {
+        Date now = new Date();
+        // order document save
+        for (String fileId : fileIdList) {
+            OrderDocumentEntity document = new OrderDocumentEntity();
+            document.setOrderId(orderId);
+            document.setFileId(fileId);
+            document.setOperateType(operateType.getValue());
+            document.setIsDelete(YesNoStatus.NO.getValue());
+            document.setCreateTime(now);
+            document.setUpdateTime(now);
+            orderDocumentMapper.insert(document);
+        }
+    }
+
+
+    private void orderRecordInit(Long orderId, OrderOperateType operateType, List<String> fileIdList, Long operatorId) {
+        Date now = new Date();
+        // order record save
+        OrderRecordEntity record = new OrderRecordEntity();
+        record.setOperateType(operateType.getValue());
+        String currentIds = StringUtils.join(fileIdList, ",");
+        record.setCurrentDocumentIds(currentIds);
+        record.setOrderId(orderId);
+        record.setOperatorId(operatorId);
+        UserEntity userEntity = userMapper.selectById(operatorId);
+        record.setOperator(userEntity.getName());
+        record.setCreateTime(now);
+        record.setUpdateTime(now);
+        orderRecordMapper.insert(record);
+    }
+
+
     @Override
     @Transactional
     public void create(Long userId, OrderCreateDto createDto) throws BusinessDefaultException {
@@ -77,8 +110,8 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
             throw new BusinessDefaultException("客户地址不存在");
         }
 
-        Date installTime = CoreDateUtils.parseDateTime(createDto.getInstallTime());
-        if (installTime == null) {
+        Date visitTime = CoreDateUtils.parseDateTime(createDto.getVisitTime());
+        if (visitTime == null) {
             throw new BusinessDefaultException("预约时间格式不正确");
         }
 
@@ -95,42 +128,106 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         order.setOwnerId(userId);
         order.setOwnerName(user.getName());
         order.setCustomerId(customer.getCustomerId());
+        order.setAddressId(address.getId());
         order.setCustomerName(customer.getName());
-        order.setCustomerPhone(customer.getPhone());
         order.setAddress(address.getAddress());
+        order.setCustomerPhone(customer.getPhone());
         order.setLatitude(address.getLatitude());
         order.setLongitude(address.getLongitude());
         order.setStatus(OrderStatus.PENDING.getValue());
-        order.setVisitTime(installTime);
+        order.setVisitTime(visitTime);
         order.setDemo(createDto.getDemo());
         order.setCreateTime(now);
         order.setUpdateTime(now);
         orderMapper.insert(order);
 
         // order document save
-        for (String fileId : fileIdList) {
-            OrderDocumentEntity document = new OrderDocumentEntity();
-            document.setOrderId(orderId);
-            document.setFileId(fileId);
-            document.setOperateType(OrderOperateType.CREATE.getValue());
-            document.setIsDelete(YesNoStatus.NO.getValue());
-            document.setCreateTime(now);
-            document.setUpdateTime(now);
-            orderDocumentMapper.insert(document);
-        }
+        orderDocumentInit(orderId, OrderOperateType.CREATE, fileIdList);
 
         // order record save
-        OrderRecordEntity record = new OrderRecordEntity();
-        record.setOperateType(OrderOperateType.CREATE.getValue());
-        String currentIds = StringUtils.join(fileIdList, ",");
-        record.setCurrentDocumentIds(currentIds);
-        record.setOrderId(orderId);
-        record.setOperatorId(userId);
-        record.setCreateTime(now);
-        record.setUpdateTime(now);
-        orderRecordMapper.insert(record);
+        orderRecordInit(orderId, OrderOperateType.CREATE, fileIdList, userId);
         logger.info("订单创建成功，orderId={}, userId={}", orderId, userId);
     }
+
+    @Override
+    @Transactional
+    public void edit(Long userId, OrderEditDto editDto) throws BusinessDefaultException {
+        OrderEntity orderEntity = orderMapper.selectById(editDto.getOrderId());
+        if (orderEntity == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.PENDING.getValue() != orderEntity.getStatus()) {
+            throw new BusinessDefaultException("非待安装订单状态，操作失败");
+        }
+
+        Date visitTime = CoreDateUtils.parseDateTime(editDto.getVisitTime());
+        if (visitTime == null) {
+            throw new BusinessDefaultException("预约时间格式不正确");
+        }
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(orderEntity.getOrderId());
+
+
+        if (editDto.getCustomerId().equals(orderEntity.getCustomerId())) {
+            orderUpdate.setCustomerId(editDto.getCustomerId());
+
+            CustomerEntity customer = customerMapper.selectById(editDto.getCustomerId());
+            if (customer == null) {
+                throw new BusinessDefaultException("客户不存在");
+            }
+
+            orderUpdate.setCustomerName(customer.getName());
+            orderUpdate.setCustomerPhone(customer.getPhone());
+        }
+
+        if (editDto.getCustomerAddressId().equals(orderEntity.getAddressId())) {
+            orderUpdate.setAddressId(editDto.getCustomerAddressId());
+            CustomerAddressEntity address = customerAddressMapper.selectById(editDto.getCustomerAddressId());
+            if (address == null) {
+                throw new BusinessDefaultException("客户地址不存在");
+            }
+
+            orderUpdate.setAddress(address.getAddress());
+            orderUpdate.setLatitude(address.getLatitude());
+            orderUpdate.setLongitude(address.getLongitude());
+        }
+
+
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setVisitTime(visitTime);
+        orderUpdate.setDemo(editDto.getDemo());
+
+        orderMapper.updateById(orderUpdate);
+
+        List<String> fileIdList = editDto.getAddFileIdList();
+        // order document save
+        orderDocumentInit(orderEntity.getOrderId(), OrderOperateType.EDIT, fileIdList);
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(editDto.getOrderId());
+        fileIdList.addAll(oldFileList);
+
+        // order record save
+        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.EDIT, fileIdList, userId);
+        logger.info("编辑订单成功，orderId={}", editDto.getOrderId());
+    }
+
+
+    private List<String> findOrderFileIds(Long orderId) {
+        List<String> fileIdList = Lists.newArrayList();
+        LambdaQueryWrapper<OrderDocumentEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderDocumentEntity::getOrderId, orderId);
+        queryWrapper.eq(OrderDocumentEntity::getIsDelete, YesNoStatus.NO.getValue());
+        List<OrderDocumentEntity> documentEntityList = orderDocumentMapper.selectList(queryWrapper);
+        if (!documentEntityList.isEmpty()) {
+            documentEntityList.forEach(it -> fileIdList.add(it.getFileId()));
+        }
+        return fileIdList;
+    }
+
 
     @Override
     public Page<OrderEntity> list(Long userId, OrderListDto listDto) throws BusinessDefaultException {
@@ -167,5 +264,138 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         Page<OrderEntity> page = Page.of(listDto.getPageNum(), listDto.getPageSize());
         return orderMapper.selectPage(page, queryWrapper);
 
+    }
+
+    @Override
+    @Transactional
+    public void install(Long userId, OrderInstallDto installDto) throws BusinessDefaultException {
+        OrderEntity orderEntity = orderMapper.selectById(installDto.getOrderId());
+        if (orderEntity == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.PENDING.getValue() != orderEntity.getStatus()) {
+            throw new BusinessDefaultException("非待安装订单状态，操作失败");
+        }
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(orderEntity.getOrderId());
+        orderUpdate.setStatus(OrderStatus.INSTALL.getValue());
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setInstallTime(now);
+        orderMapper.updateById(orderUpdate);
+
+        List<String> fileIdList = installDto.getFileIdList();
+
+        // order document save
+        orderDocumentInit(orderEntity.getOrderId(), OrderOperateType.INSTALL, fileIdList);
+
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(installDto.getOrderId());
+        fileIdList.addAll(oldFileList);
+
+        // order record save
+        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.INSTALL, fileIdList, userId);
+        logger.info("订单安装完成，orderId={}, userId={}", orderEntity.getOrderId(), userId);
+    }
+
+    @Override
+    public void cancel(Long userId, OrderCancelDto cancelDto) throws BusinessDefaultException {
+        OrderEntity order = orderMapper.selectById(cancelDto.getOrderId());
+        if (order == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.PENDING.getValue() != order.getStatus()) {
+            throw new BusinessDefaultException("非待安装订单状态，操作失败");
+        }
+
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(order.getOrderId());
+        orderUpdate.setCancelTime(now);
+        orderUpdate.setCancelReason(cancelDto.getReason());
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setStatus(OrderStatus.CANCEL.getValue());
+        orderMapper.updateById(orderUpdate);
+        logger.info("取消订单成功，orderId={}", cancelDto.getOrderId());
+    }
+
+    @Override
+    public OrderDetailVo detail(Long orderId) throws BusinessDefaultException {
+        OrderEntity order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        OrderDetailVo detailVo = new OrderDetailVo();
+
+        detailVo.setOrderId(order.getOrderId());
+        detailVo.setCreator(order.getOwnerName());
+        OrderStatus orderStatus = OrderStatus.get(order.getStatus());
+        if (orderStatus == null) {
+            return null;
+        }
+        switch (orderStatus) {
+            case PENDING:
+                detailVo.setOrderStatusName("待安装");
+                break;
+            case AFTER_SALES_PENDING:
+                detailVo.setOrderStatusName("售后中");
+                break;
+            case CANCEL:
+                detailVo.setOrderStatusName("已取消");
+                break;
+            case AFTER_SALES_INSTALL:
+            case INSTALL:
+                detailVo.setOrderStatusName("处理完成");
+                break;
+        }
+        detailVo.setCreateTime(CoreDateUtils.formatDateTime(order.getCreateTime()));
+        detailVo.setCustomer(order.getCustomerName());
+        detailVo.setCustomerPhone(order.getCustomerPhone());
+        detailVo.setCustomerId(order.getCustomerId());
+        detailVo.setAddress(order.getAddress());
+        detailVo.setLatitude(order.getLatitude());
+        detailVo.setLongitude(order.getLongitude());
+        detailVo.setOrderDemo(order.getDemo());
+        detailVo.setInviteTime(CoreDateUtils.formatDateTime(order.getVisitTime()));
+        detailVo.setAfterSalesTime(order.getAfterSalesTime() == null ? StringUtils.EMPTY : CoreDateUtils.formatDateTime(order.getAfterSalesTime()));
+        detailVo.setCustomerAddressId(order.getAddressId());
+
+        CustomerEntity customerEntity = customerMapper.selectById(order.getCustomerId());
+        detailVo.setGenderType(customerEntity.getGenderType());
+
+
+        List<String> fileIdList = Lists.newArrayList();
+        LambdaQueryWrapper<OrderDocumentEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderDocumentEntity::getOrderId, orderId);
+        queryWrapper.eq(OrderDocumentEntity::getIsDelete, YesNoStatus.NO.getValue());
+        List<OrderDocumentEntity> documentEntityList = orderDocumentMapper.selectList(queryWrapper);
+        if (!documentEntityList.isEmpty()) {
+            documentEntityList.forEach(it -> fileIdList.add(it.getFileId()));
+        }
+        detailVo.setFileIdList(fileIdList);
+
+        List<OrderRecordVo> recordList = Lists.newArrayList();
+        LambdaQueryWrapper<OrderRecordEntity> queryRecordWrapper = new LambdaQueryWrapper<>();
+        queryRecordWrapper.eq(OrderRecordEntity::getOrderId, orderId);
+        List<OrderRecordEntity> recordEntityList = orderRecordMapper.selectList(queryRecordWrapper);
+        if (!recordEntityList.isEmpty()) {
+            for (OrderRecordEntity record : recordEntityList) {
+                OrderRecordVo recordVo = new OrderRecordVo();
+                recordVo.setOperator(record.getOperator());
+                recordVo.setOperateTime(CoreDateUtils.formatDateTime(record.getCreateTime()));
+                recordVo.setOperateType(OrderOperateType.get(record.getOperateType()).getName());
+                String[] currentIdList = StringUtils.split(record.getCurrentDocumentIds(), ",");
+                recordVo.setCurrentFileIdList(Lists.newArrayList(currentIdList));
+                recordList.add(recordVo);
+            }
+        }
+        detailVo.setRecordList(recordList);
+        return detailVo;
     }
 }

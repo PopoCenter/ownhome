@@ -37,6 +37,8 @@ public class OrderRecordEntity {
      */
     private Long operatorId;
 
+    private String operator;
+
     /**
      * 当前 单据id
      */
@@ -108,5 +110,13 @@ public class OrderRecordEntity {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getOperator() {
+        return operator;
+    }
+
+    public void setOperator(String operator) {
+        this.operator = operator;
     }
 }

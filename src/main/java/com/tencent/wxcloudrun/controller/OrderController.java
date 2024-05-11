@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
 import com.tencent.wxcloudrun.config.ResponseMessage;
-import com.tencent.wxcloudrun.dto.OrderCreateDto;
-import com.tencent.wxcloudrun.dto.OrderListDto;
-import com.tencent.wxcloudrun.dto.TeamCreateDto;
+import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.OrderEntity;
 import com.tencent.wxcloudrun.entity.UserEntity;
 import com.tencent.wxcloudrun.enums.OrderStatus;
@@ -15,6 +13,7 @@ import com.tencent.wxcloudrun.service.OrderIService;
 import com.tencent.wxcloudrun.service.TeamIService;
 import com.tencent.wxcloudrun.service.UserIService;
 import com.tencent.wxcloudrun.util.CoreDateUtils;
+import com.tencent.wxcloudrun.vo.OrderDetailVo;
 import com.tencent.wxcloudrun.vo.OrderListItemVo;
 import com.tencent.wxcloudrun.vo.OrderListVo;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +51,53 @@ public class OrderController extends BaseController {
 
             orderIService.create(userEntity.getUserId(), createDto);
             return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+
+    /**
+     * 编辑订单
+     */
+    @PostMapping(value = "/edit")
+    ResponseMessage<?> edit(@RequestBody @Validated(OrderEditDto.Add.class) OrderEditDto editDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                return ResponseMessage.fail(ResponseEnum.USER_NOT_EXIST, "用户不存在");
+            }
+
+            orderIService.edit(userEntity.getUserId(), editDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+
+    /**
+     * 订单详情
+     */
+    @PostMapping(value = "/detail")
+    ResponseMessage<OrderDetailVo> detail(@RequestBody @Validated(OrderDetailDto.Verify.class) OrderDetailDto detailDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                return ResponseMessage.fail(ResponseEnum.USER_NOT_EXIST, "用户不存在");
+            }
+            OrderDetailVo detailVo = orderIService.detail(detailDto.getOrderId());
+            return ResponseMessage.success(detailVo);
         } catch (BusinessDefaultException ue) {
             logger.error(ue.getMessage(), ue);
             return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
@@ -120,5 +166,55 @@ public class OrderController extends BaseController {
             return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
         }
     }
+
+
+
+    /**
+     * 安装订单
+     */
+    @PostMapping(value = "/install")
+    ResponseMessage<?> install(@RequestBody @Validated(OrderInstallDto.Verify.class) OrderInstallDto installDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            orderIService.install(userEntity.getUserId(), installDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+    /**
+     * 取消订单
+     */
+    @PostMapping(value = "/cancel")
+    ResponseMessage<?> cancel(@RequestBody @Validated(OrderCancelDto.Verify.class) OrderCancelDto cancelDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            orderIService.cancel(userEntity.getUserId(), cancelDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+
 
 }

@@ -39,6 +39,12 @@ public class OrderEntity {
      */
     private Long customerId;
 
+
+    /**
+     * 客户id
+     */
+    private Long addressId;
+
     /**
      * 客户
      */
@@ -53,6 +59,7 @@ public class OrderEntity {
      * 地址信息
      */
     private String address;
+
 
     /**
      * 经度
@@ -70,12 +77,27 @@ public class OrderEntity {
      */
     private Integer status;
 
+
     /**
      * 预约上门时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date visitTime;
 
+    /**
+     * 上门安装时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date installTime;
+
+
+    /**
+     * 取消订单时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date cancelTime;
+
+    private String cancelReason;
 
     /**
      * 订单备注
@@ -93,6 +115,12 @@ public class OrderEntity {
      * 售后原因
      */
     private String afterSalesReason;
+
+    /**
+     * 售后上门安装时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date salesInstallTime;
 
 
     /**
@@ -234,5 +262,45 @@ public class OrderEntity {
 
     public void setAfterSalesReason(String afterSalesReason) {
         this.afterSalesReason = afterSalesReason;
+    }
+
+    public Date getInstallTime() {
+        return installTime;
+    }
+
+    public void setInstallTime(Date installTime) {
+        this.installTime = installTime;
+    }
+
+    public Date getSalesInstallTime() {
+        return salesInstallTime;
+    }
+
+    public void setSalesInstallTime(Date salesInstallTime) {
+        this.salesInstallTime = salesInstallTime;
+    }
+
+    public Long getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Long addressId) {
+        this.addressId = addressId;
+    }
+
+    public Date getCancelTime() {
+        return cancelTime;
+    }
+
+    public void setCancelTime(Date cancelTime) {
+        this.cancelTime = cancelTime;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 }
