@@ -3,10 +3,7 @@ package com.tencent.wxcloudrun.controller;
 import com.google.common.collect.Lists;
 import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
 import com.tencent.wxcloudrun.config.ResponseMessage;
-import com.tencent.wxcloudrun.dto.TeamCreateDto;
-import com.tencent.wxcloudrun.dto.TeamJoinDto;
-import com.tencent.wxcloudrun.dto.TeamModifyDto;
-import com.tencent.wxcloudrun.dto.UserModifyDto;
+import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.TeamEntity;
 import com.tencent.wxcloudrun.entity.TeamMemberEntity;
 import com.tencent.wxcloudrun.entity.UserEntity;
@@ -155,6 +152,30 @@ public class TeamController extends BaseController {
             }
 
             teamIService.exit(userEntity.getUserId());
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+
+    /**
+     * 移除团队
+     */
+    @PostMapping(value = "/fire")
+    ResponseMessage<?> fire(@RequestBody @Validated(TeamMemberFireDto.Add.class) TeamMemberFireDto fireDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            teamIService.fire(userEntity.getUserId(), fireDto.getMemberId());
             return ResponseMessage.success();
         } catch (BusinessDefaultException ue) {
             logger.error(ue.getMessage(), ue);

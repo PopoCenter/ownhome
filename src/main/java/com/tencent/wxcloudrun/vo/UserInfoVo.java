@@ -17,6 +17,16 @@ public class UserInfoVo {
 
     private String teamId;
 
+    private Integer role;
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
     public String getTeamId() {
         return teamId;
     }

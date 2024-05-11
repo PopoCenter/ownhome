@@ -12,6 +12,7 @@ public interface TeamIService extends IService<TeamEntity> {
 
     /**
      * 查询团队
+     *
      * @param userId
      * @return
      * @throws BusinessDefaultException
@@ -20,24 +21,27 @@ public interface TeamIService extends IService<TeamEntity> {
 
     /**
      * 创建团队
+     *
      * @param userId
      * @param name
      * @throws BusinessDefaultException
      */
-    void create(Long userId, String name)  throws BusinessDefaultException;
+    void create(Long userId, String name) throws BusinessDefaultException;
 
 
     /**
      * 被邀请人加入团队
+     *
      * @param userId
      * @param teamId
      * @param inviteId
      * @throws BusinessDefaultException
      */
-    void join(Long userId, Long teamId, Long inviteId)  throws BusinessDefaultException;
+    void join(Long userId, Long teamId, Long inviteId) throws BusinessDefaultException;
 
     /**
      * 查询团队成员
+     *
      * @param userId
      * @return
      * @throws BusinessDefaultException
@@ -47,23 +51,43 @@ public interface TeamIService extends IService<TeamEntity> {
 
     /**
      * 修改团队名称
+     *
      * @param userId
      * @param name
      * @throws BusinessDefaultException
      */
-    void modify(Long userId, String name)  throws BusinessDefaultException;
+    void modify(Long userId, String name) throws BusinessDefaultException;
 
     /**
      * 退出团队
+     *
      * @param userId
      * @throws BusinessDefaultException
      */
-    void exit(Long userId)  throws BusinessDefaultException;
+    void exit(Long userId) throws BusinessDefaultException;
 
     /**
      * 解散团队
+     *
      * @param userId
      * @throws BusinessDefaultException
      */
-    void dismiss(Long userId)  throws BusinessDefaultException;
+    void dismiss(Long userId) throws BusinessDefaultException;
+
+    /**
+     * 移除团队
+     *
+     * @param userId
+     * @throws BusinessDefaultException
+     */
+    void fire(Long userId, Long memberId) throws BusinessDefaultException;
+
+    /**
+     * query
+     *
+     * @param userId
+     * @return
+     * @throws BusinessDefaultException
+     */
+    TeamMemberEntity findMemberByUserId(Long userId) throws BusinessDefaultException;
 }

@@ -1,36 +1,29 @@
 package com.tencent.wxcloudrun.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
-import com.tencent.wxcloudrun.config.ApiResponse;
 import com.tencent.wxcloudrun.config.ResponseMessage;
-import com.tencent.wxcloudrun.dto.*;
+import com.tencent.wxcloudrun.dto.RegisterDto;
+import com.tencent.wxcloudrun.dto.SendMessageDto;
+import com.tencent.wxcloudrun.dto.UserModifyDto;
+import com.tencent.wxcloudrun.dto.VerifyCodeDto;
 import com.tencent.wxcloudrun.entity.TeamEntity;
+import com.tencent.wxcloudrun.entity.TeamMemberEntity;
 import com.tencent.wxcloudrun.entity.UserEntity;
 import com.tencent.wxcloudrun.enums.ResponseEnum;
-import com.tencent.wxcloudrun.model.Counter;
-import com.tencent.wxcloudrun.service.CounterService;
 import com.tencent.wxcloudrun.service.TeamIService;
 import com.tencent.wxcloudrun.service.UserIService;
 import com.tencent.wxcloudrun.util.CoreStringUtils;
 import com.tencent.wxcloudrun.util.SendSmsUtil;
 import com.tencent.wxcloudrun.vo.UserInfoVo;
-import com.tencent.wxcloudrun.vo.VerifyCodeVo;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -174,6 +167,8 @@ public class UserController extends BaseController {
             if (teamEntity != null) {
                 userInfoVo.setTeamName(teamEntity.getName());
                 userInfoVo.setTeamId(teamEntity.getTeamId().toString());
+                TeamMemberEntity memberEntity = teamIService.findMemberByUserId(userEntity.getUserId());
+                userInfoVo.setRole(memberEntity.getMemberRole());
             }
 
             return ResponseMessage.success(userInfoVo);

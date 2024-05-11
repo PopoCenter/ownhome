@@ -192,4 +192,28 @@ public class TeamIServiceImpl extends ServiceImpl<TeamMapper, TeamEntity> implem
 
         logger.info("解散团队成功，userId={}", userId);
     }
+
+    @Override
+    public void fire(Long userId, Long memberId) throws BusinessDefaultException {
+        LambdaQueryWrapper<TeamMemberEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeamMemberEntity::getMemberId, userId);
+        TeamMemberEntity memberEntity = teamMemberMapper.selectOne(queryWrapper);
+        if (memberEntity == null) {
+            return;
+        }
+
+        if (MemberRole.MANAGER.getValue() != memberEntity.getMemberRole()) {
+            throw new BusinessDefaultException("非管理员不可移除团队成员");
+        }
+
+        teamMemberMapper.deleteById(memberId);
+        logger.info("移除团队成功，userId={}, memberId={}", userId, memberId);
+    }
+
+    @Override
+    public TeamMemberEntity findMemberByUserId(Long userId) throws BusinessDefaultException {
+        LambdaQueryWrapper<TeamMemberEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeamMemberEntity::getMemberId, userId);
+        return teamMemberMapper.selectOne(queryWrapper);
+    }
 }
