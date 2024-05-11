@@ -28,6 +28,11 @@ public class OrderEntity {
      */
     private Long ownerId;
 
+    /**
+     * 创建人
+     */
+    private String ownerName;
+
 
     /**
      * 客户id
@@ -35,9 +40,30 @@ public class OrderEntity {
     private Long customerId;
 
     /**
-     * 客户地址id
+     * 客户
      */
-    private Long addressId;
+    private String customerName;
+
+    /**
+     * 客户
+     */
+    private String customerPhone;
+
+    /**
+     * 地址信息
+     */
+    private String address;
+
+    /**
+     * 经度
+     */
+    private String latitude;
+
+    /**
+     * 纬度
+     */
+    private String longitude;
+
 
     /**
      * 订单状态
@@ -55,6 +81,19 @@ public class OrderEntity {
      * 订单备注
      */
     private String demo;
+
+
+    /**
+     * 售后预约上门时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date afterSalesTime;
+
+    /**
+     * 售后原因
+     */
+    private String afterSalesReason;
+
 
     /**
      * 创建时间
@@ -93,12 +132,28 @@ public class OrderEntity {
         this.customerId = customerId;
     }
 
-    public Long getAddressId() {
-        return addressId;
+    public String getAddress() {
+        return address;
     }
 
-    public void setAddressId(Long addressId) {
-        this.addressId = addressId;
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     public Integer getStatus() {
@@ -139,5 +194,45 @@ public class OrderEntity {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
+    public Date getAfterSalesTime() {
+        return afterSalesTime;
+    }
+
+    public void setAfterSalesTime(Date afterSalesTime) {
+        this.afterSalesTime = afterSalesTime;
+    }
+
+    public String getAfterSalesReason() {
+        return afterSalesReason;
+    }
+
+    public void setAfterSalesReason(String afterSalesReason) {
+        this.afterSalesReason = afterSalesReason;
     }
 }

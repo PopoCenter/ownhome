@@ -16,6 +16,7 @@ import com.tencent.wxcloudrun.model.Counter;
 import com.tencent.wxcloudrun.service.CounterService;
 import com.tencent.wxcloudrun.service.TeamIService;
 import com.tencent.wxcloudrun.service.UserIService;
+import com.tencent.wxcloudrun.util.CoreStringUtils;
 import com.tencent.wxcloudrun.util.SendSmsUtil;
 import com.tencent.wxcloudrun.vo.UserInfoVo;
 import com.tencent.wxcloudrun.vo.VerifyCodeVo;
@@ -76,12 +77,13 @@ public class UserController extends BaseController {
             //SendSmsUtil.sendSms(request);
 
             Random random = new Random();
-            int code = random.nextInt(999999) + 100000; // 生成一个六位数的随机数，从100000到999999
+            //int code = random.nextInt(999999) + 100000; // 生成一个六位数的随机数，从100000到999999
+
+            String code = CoreStringUtils.generateRandomStr(6);
 
             //缓存5分钟 5分钟后失效
 
-            codeCache.put(phone, String.valueOf(code));
-
+            codeCache.put(phone, code);
 
             logger.info("generate code success, code={}", code);
             return ResponseMessage.success();

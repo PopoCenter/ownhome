@@ -43,11 +43,6 @@ public class OrderRecordEntity {
     private String currentDocumentIds;
 
     /**
-     * 操作后 单据id
-     */
-    private String afterDocumentIds;
-
-    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -97,14 +92,6 @@ public class OrderRecordEntity {
 
     public void setCurrentDocumentIds(String currentDocumentIds) {
         this.currentDocumentIds = currentDocumentIds;
-    }
-
-    public String getAfterDocumentIds() {
-        return afterDocumentIds;
-    }
-
-    public void setAfterDocumentIds(String afterDocumentIds) {
-        this.afterDocumentIds = afterDocumentIds;
     }
 
     public Date getCreateTime() {

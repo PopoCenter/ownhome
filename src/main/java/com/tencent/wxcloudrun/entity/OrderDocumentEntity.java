@@ -30,7 +30,12 @@ public class OrderDocumentEntity {
     /**
      * 单据地址
      */
-    private String path;
+    private String fileId;
+
+    /**
+     * 操作类型
+     */
+    private Integer operateType;
 
     /**
      * 是否删除
@@ -73,12 +78,12 @@ public class OrderDocumentEntity {
         this.orderId = orderId;
     }
 
-    public String getPath() {
-        return path;
+    public String getFileId() {
+        return fileId;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     public Date getCreateTime() {
@@ -95,5 +100,13 @@ public class OrderDocumentEntity {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getOperateType() {
+        return operateType;
+    }
+
+    public void setOperateType(Integer operateType) {
+        this.operateType = operateType;
     }
 }
