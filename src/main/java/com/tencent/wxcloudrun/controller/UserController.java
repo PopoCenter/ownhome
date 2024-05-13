@@ -72,7 +72,7 @@ public class UserController extends BaseController {
             Random random = new Random();
             //int code = random.nextInt(999999) + 100000; // 生成一个六位数的随机数，从100000到999999
 
-            String code = CoreStringUtils.generateRandomStr(6);
+            String code = CoreStringUtils.generateRandomCode(6);
 
             //缓存5分钟 5分钟后失效
 

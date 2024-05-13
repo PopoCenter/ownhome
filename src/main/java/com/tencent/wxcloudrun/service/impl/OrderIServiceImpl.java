@@ -203,11 +203,11 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderMapper.updateById(orderUpdate);
 
         List<String> fileIdList = editDto.getAddFileIdList();
+        // old file
+        List<String> oldFileList = findOrderFileIds(editDto.getOrderId());
         // order document save
         orderDocumentInit(orderEntity.getOrderId(), OrderOperateType.EDIT, fileIdList);
 
-        // old file
-        List<String> oldFileList = findOrderFileIds(editDto.getOrderId());
         fileIdList.addAll(oldFileList);
 
         // order record save
@@ -287,21 +287,21 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderMapper.updateById(orderUpdate);
 
         List<String> fileIdList = installDto.getFileIdList();
+        // old file
+        List<String> oldFileList = findOrderFileIds(installDto.getOrderId());
 
         // order document save
         orderDocumentInit(orderEntity.getOrderId(), OrderOperateType.INSTALL, fileIdList);
 
 
-        // old file
-        List<String> oldFileList = findOrderFileIds(installDto.getOrderId());
         fileIdList.addAll(oldFileList);
-
         // order record save
         orderRecordInit(orderEntity.getOrderId(), OrderOperateType.INSTALL, fileIdList, userId);
         logger.info("订单安装完成，orderId={}, userId={}", orderEntity.getOrderId(), userId);
     }
 
     @Override
+    @Transactional
     public void cancel(Long userId, OrderCancelDto cancelDto) throws BusinessDefaultException {
         OrderEntity order = orderMapper.selectById(cancelDto.getOrderId());
         if (order == null) {
@@ -322,6 +322,124 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderUpdate.setStatus(OrderStatus.CANCEL.getValue());
         orderMapper.updateById(orderUpdate);
         logger.info("取消订单成功，orderId={}", cancelDto.getOrderId());
+    }
+
+    @Override
+    @Transactional
+    public void afterSales(Long userId, OrderAfterSalesDto salesDto) throws BusinessDefaultException {
+        OrderEntity order = orderMapper.selectById(salesDto.getOrderId());
+        if (order == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.INSTALL.getValue() != order.getStatus()) {
+            throw new BusinessDefaultException("非已完成订单状态，操作失败");
+        }
+
+
+        Date visitTime = CoreDateUtils.parseDateTime(salesDto.getSalesVisitTime());
+        if (visitTime == null) {
+            throw new BusinessDefaultException("预约时间格式不正确");
+        }
+
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(order.getOrderId());
+        orderUpdate.setStatus(OrderStatus.AFTER_SALES_PENDING.getValue());
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setAfterSalesTime(visitTime);
+        orderUpdate.setAfterSalesReason(salesDto.getReason());
+        orderMapper.updateById(orderUpdate);
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(order.getOrderId());
+
+        List<String> fileIdList = salesDto.getAddFileIdList();
+
+        // order document save
+        orderDocumentInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CREATE, fileIdList);
+
+        fileIdList.addAll(oldFileList);
+        // order record save
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CREATE, fileIdList, userId);
+        logger.info("创建售后完成，orderId={}, userId={}", order.getOrderId(), userId);
+
+    }
+
+    @Override
+    @Transactional
+    public void afterSalesEdit(Long userId, OrderAfterSalesEditDto editDto) throws BusinessDefaultException {
+        OrderEntity order = orderMapper.selectById(editDto.getOrderId());
+        if (order == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.AFTER_SALES_PENDING.getValue() != order.getStatus()) {
+            throw new BusinessDefaultException("非售后中订单状态，操作失败");
+        }
+
+
+        Date visitTime = CoreDateUtils.parseDateTime(editDto.getSalesVisitTime());
+        if (visitTime == null) {
+            throw new BusinessDefaultException("预约时间格式不正确");
+        }
+
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(order.getOrderId());
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setAfterSalesTime(visitTime);
+        orderUpdate.setAfterSalesReason(editDto.getReason());
+        orderMapper.updateById(orderUpdate);
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(order.getOrderId());
+
+        List<String> fileIdList = editDto.getAddFileIdList();
+
+        // order document save
+        orderDocumentInit(order.getOrderId(), OrderOperateType.AFTER_SALES_EDIT, fileIdList);
+
+        fileIdList.addAll(oldFileList);
+        // order record save
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_EDIT, fileIdList, userId);
+        logger.info("编辑售后订单完成，orderId={}, userId={}", order.getOrderId(), userId);
+    }
+
+    @Override
+    @Transactional
+    public void afterSalesFinish(Long userId, OrderAfterSalesFinishDto finishDto) throws BusinessDefaultException {
+        OrderEntity order = orderMapper.selectById(finishDto.getOrderId());
+        if (order == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.AFTER_SALES_PENDING.getValue() != order.getStatus()) {
+            throw new BusinessDefaultException("非售后中订单状态，操作失败");
+        }
+
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(order.getOrderId());
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setAfterSalesReason(finishDto.getReason());
+        orderMapper.updateById(orderUpdate);
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(order.getOrderId());
+
+        List<String> fileIdList = finishDto.getAddFileIdList();
+
+        // order document save
+        orderDocumentInit(order.getOrderId(), OrderOperateType.AFTER_SALES_FINISH, fileIdList);
+
+        fileIdList.addAll(oldFileList);
+        // order record save
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_FINISH, fileIdList, userId);
+        logger.info("售后订单处理完成，orderId={}, userId={}", order.getOrderId(), userId);
     }
 
     @Override

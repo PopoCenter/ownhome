@@ -168,7 +168,6 @@ public class OrderController extends BaseController {
     }
 
 
-
     /**
      * 安装订单
      */
@@ -215,6 +214,76 @@ public class OrderController extends BaseController {
         }
     }
 
+
+    /**
+     * 售后
+     */
+    @PostMapping(value = "/afterSales")
+    ResponseMessage<?> afterSales(@RequestBody @Validated(OrderAfterSalesDto.Verify.class) OrderAfterSalesDto salesDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            orderIService.afterSales(userEntity.getUserId(), salesDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+
+    /**
+     * 售后编辑
+     */
+    @PostMapping(value = "/afterSales/edit")
+    ResponseMessage<?> salesEdit(@RequestBody @Validated(OrderAfterSalesEditDto.Verify.class) OrderAfterSalesEditDto editDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            orderIService.afterSalesEdit(userEntity.getUserId(), editDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+    /**
+     * 售后编辑
+     */
+    @PostMapping(value = "/afterSales/finish")
+    ResponseMessage<?> finish(@RequestBody @Validated(OrderAfterSalesFinishDto.Verify.class) OrderAfterSalesFinishDto finishDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            orderIService.afterSalesFinish(userEntity.getUserId(), finishDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
 
 
 }

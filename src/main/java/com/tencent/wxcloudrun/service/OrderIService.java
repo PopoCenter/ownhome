@@ -73,6 +73,38 @@ public interface OrderIService extends IService<OrderEntity> {
     void cancel(Long userId, OrderCancelDto cancelDto) throws BusinessDefaultException;
 
 
+
+
+    /**
+     * afterSales
+     *
+     * @param userId
+     * @param salesDto
+     * @throws BusinessDefaultException
+     */
+    void afterSales(Long userId, OrderAfterSalesDto salesDto) throws BusinessDefaultException;
+
+
+    /**
+     * afterSales
+     *
+     * @param userId
+     * @param editDto
+     * @throws BusinessDefaultException
+     */
+    void afterSalesEdit(Long userId, OrderAfterSalesEditDto editDto) throws BusinessDefaultException;
+
+
+    /**
+     * afterSales
+     *
+     * @param userId
+     * @param finishDto
+     * @throws BusinessDefaultException
+     */
+    void afterSalesFinish(Long userId, OrderAfterSalesFinishDto finishDto) throws BusinessDefaultException;
+
+
     /**
      * detail
      *
