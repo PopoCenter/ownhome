@@ -7,6 +7,7 @@ import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.*;
 import com.tencent.wxcloudrun.enums.ResponseEnum;
 import com.tencent.wxcloudrun.service.*;
+import com.tencent.wxcloudrun.util.ChangeChinesePinyinUtil;
 import com.tencent.wxcloudrun.util.CoreDateUtils;
 import com.tencent.wxcloudrun.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * counter控制器
@@ -74,13 +76,38 @@ public class CustomerController extends BaseController {
                 throw new BusinessDefaultException("用户不存在");
             }
 
+
+            List<CustomerListVoItemMap> mapList = Lists.newArrayList();
+
             CustomerListVo listVo = new CustomerListVo();
             List<CustomerListVoItem> customerList = Lists.newArrayList();
             TeamEntity teamEntity = teamIService.findByUserId(userEntity.getUserId());
             if (teamEntity != null) {
                 customerList = customerIService.findByTeamId(teamEntity.getTeamId());
             }
-            listVo.setCustomerList(customerList);
+
+            if (customerList.isEmpty()) {
+                return ResponseMessage.success(listVo);
+            }
+
+
+            Map<String, List<CustomerListVoItem>> map = ChangeChinesePinyinUtil.getUserCodeGroup(customerList);
+
+            List<String> indexList = Lists.newArrayList("A", "B","C","D","E","F","G","H","I","G","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z");
+
+            for (String index : indexList) {
+                CustomerListVoItemMap itemMap = new CustomerListVoItemMap();
+                itemMap.setIndex(index);
+                List<CustomerListVoItem> voItemList = map.get(index);
+                if (voItemList.isEmpty()) {
+                    continue;
+                }
+                itemMap.setChildren(voItemList);
+                mapList.add(itemMap);
+            }
+
+            listVo.setCustomerList(mapList);
+
             return ResponseMessage.success(listVo);
         } catch (BusinessDefaultException ue) {
             logger.error(ue.getMessage(), ue);

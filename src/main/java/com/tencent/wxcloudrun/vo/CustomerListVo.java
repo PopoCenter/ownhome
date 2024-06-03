@@ -7,13 +7,14 @@ public class CustomerListVo {
 
     private static final long serialVersionUID = 382951780872523489L;
 
-    private List<CustomerListVoItem> customerList;
+    private List<CustomerListVoItemMap> customerList;
 
-    public List<CustomerListVoItem> getCustomerList() {
+
+    public List<CustomerListVoItemMap> getCustomerList() {
         return customerList;
     }
 
-    public void setCustomerList(List<CustomerListVoItem> customerList) {
+    public void setCustomerList(List<CustomerListVoItemMap> customerList) {
         this.customerList = customerList;
     }
 }
