@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class WxCloudRunApplication {  
 
   public static void main(String[] args) {
+    TimeZone.setDefault(TimeZone.getTimeZone("GMT+8:00"));
     SpringApplication.run(WxCloudRunApplication.class, args);
   }
 }

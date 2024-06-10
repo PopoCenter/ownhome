@@ -39,8 +39,6 @@ public class OrderCreateDto {
     /**
      * 订单备注
      */
-    @NotNull(groups = {OrderCreateDto.Add.class}, message = "名称不能为空")
-    @NotBlank(groups = {OrderCreateDto.Add.class}, message = "名称不能为空")
     private String demo;
 
     /**

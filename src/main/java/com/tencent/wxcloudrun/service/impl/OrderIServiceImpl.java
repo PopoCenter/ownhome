@@ -110,7 +110,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
             throw new BusinessDefaultException("客户地址不存在");
         }
 
-        Date visitTime = CoreDateUtils.parseDateTime(createDto.getVisitTime());
+        Date visitTime = CoreDateUtils.parseDate(createDto.getVisitTime());
         if (visitTime == null) {
             throw new BusinessDefaultException("预约时间格式不正确");
         }
@@ -480,7 +480,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         detailVo.setLatitude(order.getLatitude());
         detailVo.setLongitude(order.getLongitude());
         detailVo.setOrderDemo(order.getDemo());
-        detailVo.setInviteTime(CoreDateUtils.formatDateTime(order.getVisitTime()));
+        detailVo.setInviteTime(CoreDateUtils.formatDate(order.getVisitTime()));
         detailVo.setAfterSalesTime(order.getAfterSalesTime() == null ? StringUtils.EMPTY : CoreDateUtils.formatDateTime(order.getAfterSalesTime()));
         detailVo.setCustomerAddressId(order.getAddressId());
 
