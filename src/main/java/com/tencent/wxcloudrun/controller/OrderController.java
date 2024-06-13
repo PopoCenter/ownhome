@@ -153,6 +153,7 @@ public class OrderController extends BaseController {
                 itemVo.setAddress(order.getAddress());
                 itemVo.setInviteTime(CoreDateUtils.formatDate(order.getVisitTime()));
                 itemVo.setAfterSalesTime(order.getAfterSalesTime() == null ? StringUtils.EMPTY : CoreDateUtils.formatDateTime(order.getAfterSalesTime()));
+                itemVo.setDemo(order.getDemo());
                 orderList.add(itemVo);
             }
 

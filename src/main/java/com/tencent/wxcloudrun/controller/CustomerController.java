@@ -5,6 +5,7 @@ import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
 import com.tencent.wxcloudrun.config.ResponseMessage;
 import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.*;
+import com.tencent.wxcloudrun.enums.OrderStatus;
 import com.tencent.wxcloudrun.enums.ResponseEnum;
 import com.tencent.wxcloudrun.service.*;
 import com.tencent.wxcloudrun.util.ChangeChinesePinyinUtil;
@@ -162,13 +163,39 @@ public class CustomerController extends BaseController {
 
             detailVo.setAddressList(addressVoList);
 
-
             List<CustomerOrderVo> orderVoList = Lists.newArrayList();
 
-
-            // TODO: 2024/5/8
             List<OrderEntity> orderList = orderIService.findByCustomerId(customerId);
+            if (!orderList.isEmpty()) {
+                for (OrderEntity order : orderList) {
+                    CustomerOrderVo orderVo = new CustomerOrderVo();
 
+                    orderVo.setOrderId(order.getOrderId());
+                    orderVo.setCreator(order.getOwnerName());
+                    OrderStatus orderStatus = OrderStatus.get(order.getStatus());
+                    if (orderStatus == null) {
+                        return null;
+                    }
+                    switch (orderStatus) {
+                        case PENDING:
+                            orderVo.setOrderStatusName("待安装");
+                            break;
+                        case AFTER_SALES_PENDING:
+                            orderVo.setOrderStatusName("售后中");
+                            break;
+                        case CANCEL:
+                            orderVo.setOrderStatusName("已取消");
+                            break;
+                        case AFTER_SALES_INSTALL:
+                        case INSTALL:
+                            orderVo.setOrderStatusName("处理完成");
+                            break;
+                    }
+                    orderVo.setCreateTime(CoreDateUtils.formatDateTime(order.getCreateTime()));
+
+                    orderVoList.add(orderVo);
+                }
+            }
 
             detailVo.setOrderList(orderVoList);
 

@@ -56,7 +56,10 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
     @Override
     public List<OrderEntity> findByCustomerId(Long customerId) throws BusinessDefaultException {
-        return null;
+        LambdaQueryWrapper<OrderEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(OrderEntity::getCustomerId, customerId);
+        queryWrapper.orderByDesc(OrderEntity::getCreateTime);
+        return orderMapper.selectList(queryWrapper);
     }
 
 
@@ -237,6 +240,8 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
             throw new BusinessDefaultException("订单状态码错误");
         }
 
+        Page<OrderEntity> page = Page.of(listDto.getPageNum(), listDto.getPageSize());
+
         LambdaQueryWrapper<OrderEntity> queryWrapper = new LambdaQueryWrapper<>();
         // 客户名称模糊搜索
         String name = listDto.getName();
@@ -261,7 +266,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         if (!dbStatusList.isEmpty()) {
             queryWrapper.in(OrderEntity::getStatus, dbStatusList);
         }
-        Page<OrderEntity> page = Page.of(listDto.getPageNum(), listDto.getPageSize());
+
         return orderMapper.selectPage(page, queryWrapper);
 
     }

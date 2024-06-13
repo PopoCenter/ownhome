@@ -25,6 +25,16 @@ public class OrderListItemVo {
 
     private String afterSalesTime;
 
+    private String demo;
+
+    public String getDemo() {
+        return demo;
+    }
+
+    public void setDemo(String demo) {
+        this.demo = demo;
+    }
+
     public Long getOrderId() {
         return orderId;
     }

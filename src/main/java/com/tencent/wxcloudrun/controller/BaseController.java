@@ -3,7 +3,6 @@ package com.tencent.wxcloudrun.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 /**
  * 抽象Controller
