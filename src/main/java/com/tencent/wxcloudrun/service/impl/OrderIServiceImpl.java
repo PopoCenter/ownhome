@@ -231,7 +231,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         }
 
         // order record save
-        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.EDIT, addFileIdList, userId, editDto.getDemo());
+        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.EDIT, oldFileList, userId, editDto.getDemo());
         logger.info("编辑订单成功，orderId={}", editDto.getOrderId());
     }
 
@@ -455,6 +455,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderUpdate.setOrderId(order.getOrderId());
         orderUpdate.setUpdateTime(now);
         orderUpdate.setAfterSalesReason(finishDto.getReason());
+        orderUpdate.setStatus(OrderStatus.AFTER_SALES_INSTALL.getValue());
         orderMapper.updateById(orderUpdate);
 
         // old file
@@ -488,6 +489,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderUpdate.setOrderId(order.getOrderId());
         orderUpdate.setUpdateTime(now);
         orderUpdate.setAfterSalesReason(cancelDto.getReason());
+        orderUpdate.setStatus(OrderStatus.AFTER_SALES_CANCEL.getValue());
         orderMapper.updateById(orderUpdate);
 
         // old file
