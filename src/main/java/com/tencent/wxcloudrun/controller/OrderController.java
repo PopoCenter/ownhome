@@ -150,6 +150,7 @@ public class OrderController extends BaseController {
                 itemVo.setCreateTime(CoreDateUtils.formatDateTime(order.getCreateTime()));
                 itemVo.setCustomer(order.getCustomerName());
                 itemVo.setCustomerPhone(order.getCustomerPhone());
+                itemVo.setGenderType(order.getGenderType());
                 itemVo.setAddress(order.getAddress());
                 itemVo.setInviteTime(CoreDateUtils.formatDate(order.getVisitTime()));
                 itemVo.setAfterSalesTime(order.getAfterSalesTime() == null ? StringUtils.EMPTY : CoreDateUtils.formatDateTime(order.getAfterSalesTime()));
@@ -264,7 +265,7 @@ public class OrderController extends BaseController {
     }
 
     /**
-     * 售后编辑
+     * 售后完成
      */
     @PostMapping(value = "/afterSales/finish")
     ResponseMessage<?> finish(@RequestBody @Validated(OrderAfterSalesFinishDto.Verify.class) OrderAfterSalesFinishDto finishDto, @RequestHeader HttpHeaders headers) {
@@ -276,6 +277,29 @@ public class OrderController extends BaseController {
             }
 
             orderIService.afterSalesFinish(userEntity.getUserId(), finishDto);
+            return ResponseMessage.success();
+        } catch (BusinessDefaultException ue) {
+            logger.error(ue.getMessage(), ue);
+            return ResponseMessage.fail(ResponseEnum.FAILURE, ue.getMessage());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return ResponseMessage.fail(ResponseEnum.SYSTEM_CODE);
+        }
+    }
+
+    /**
+     * 售后完成
+     */
+    @PostMapping(value = "/afterSales/cancel")
+    ResponseMessage<?> salesCancel(@RequestBody @Validated(OrderAfterSalesCancelDto.Verify.class) OrderAfterSalesCancelDto cancelDto, @RequestHeader HttpHeaders headers) {
+        try {
+            String openId = getOpenId(headers);
+            UserEntity userEntity = userIService.findByOpenId(openId);
+            if (userEntity == null) {
+                throw new BusinessDefaultException("用户不存在");
+            }
+
+            orderIService.afterSalesCancel(userEntity.getUserId(), cancelDto);
             return ResponseMessage.success();
         } catch (BusinessDefaultException ue) {
             logger.error(ue.getMessage(), ue);

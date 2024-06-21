@@ -28,6 +28,15 @@ public class OrderRecordVo {
      */
     private String operateTime;
 
+    private String demo;
+
+    public String getDemo() {
+        return demo;
+    }
+
+    public void setDemo(String demo) {
+        this.demo = demo;
+    }
 
     public String getOperateType() {
         return operateType;

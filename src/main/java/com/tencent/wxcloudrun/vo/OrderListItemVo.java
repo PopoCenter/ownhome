@@ -17,6 +17,11 @@ public class OrderListItemVo {
 
     private String customer;
 
+    /**
+     * 性别
+     */
+    private Integer genderType;
+
     private String customerPhone;
 
     private String address;
@@ -26,6 +31,8 @@ public class OrderListItemVo {
     private String afterSalesTime;
 
     private String demo;
+
+
 
     public String getDemo() {
         return demo;
@@ -105,5 +112,13 @@ public class OrderListItemVo {
 
     public void setAfterSalesTime(String afterSalesTime) {
         this.afterSalesTime = afterSalesTime;
+    }
+
+    public Integer getGenderType() {
+        return genderType;
+    }
+
+    public void setGenderType(Integer genderType) {
+        this.genderType = genderType;
     }
 }

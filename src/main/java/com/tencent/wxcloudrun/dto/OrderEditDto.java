@@ -52,6 +52,11 @@ public class OrderEditDto {
      */
     private List<String> addFileIdList;
 
+    /**
+     * 删除单据文件ids
+     */
+    private List<String> deleteFileIdList;
+
     public interface Add {
     }
 
@@ -102,5 +107,13 @@ public class OrderEditDto {
 
     public void setAddFileIdList(List<String> addFileIdList) {
         this.addFileIdList = addFileIdList;
+    }
+
+    public List<String> getDeleteFileIdList() {
+        return deleteFileIdList;
+    }
+
+    public void setDeleteFileIdList(List<String> deleteFileIdList) {
+        this.deleteFileIdList = deleteFileIdList;
     }
 }

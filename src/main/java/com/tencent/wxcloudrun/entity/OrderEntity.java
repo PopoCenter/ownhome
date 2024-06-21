@@ -56,6 +56,11 @@ public class OrderEntity {
     private String customerPhone;
 
     /**
+     * 性别
+     */
+    private Integer genderType;
+
+    /**
      * 地址信息
      */
     private String address;
@@ -302,5 +307,13 @@ public class OrderEntity {
 
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
+    }
+
+    public Integer getGenderType() {
+        return genderType;
+    }
+
+    public void setGenderType(Integer genderType) {
+        this.genderType = genderType;
     }
 }

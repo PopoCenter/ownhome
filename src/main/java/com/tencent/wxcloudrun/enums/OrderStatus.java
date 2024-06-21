@@ -23,6 +23,7 @@ public enum OrderStatus {
 
     AFTER_SALES_PENDING(40, "售后中"),
     AFTER_SALES_INSTALL(50, "售后安装完成"),
+    AFTER_SALES_CANCEL(60, "取消售后"),
     ;
 
 

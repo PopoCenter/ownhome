@@ -1,6 +1,7 @@
 package com.tencent.wxcloudrun.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
@@ -79,7 +80,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
     }
 
 
-    private void orderRecordInit(Long orderId, OrderOperateType operateType, List<String> fileIdList, Long operatorId) {
+    private void orderRecordInit(Long orderId, OrderOperateType operateType, List<String> fileIdList, Long operatorId, String demo) {
         Date now = new Date();
         // order record save
         OrderRecordEntity record = new OrderRecordEntity();
@@ -92,6 +93,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         record.setOperator(userEntity.getName());
         record.setCreateTime(now);
         record.setUpdateTime(now);
+        record.setDemo(demo);
         orderRecordMapper.insert(record);
     }
 
@@ -133,6 +135,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         order.setCustomerId(customer.getCustomerId());
         order.setAddressId(address.getId());
         order.setCustomerName(customer.getName());
+        order.setGenderType(customer.getGenderType());
         order.setAddress(address.getAddress());
         order.setCustomerPhone(customer.getPhone());
         order.setLatitude(address.getLatitude());
@@ -148,7 +151,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderDocumentInit(orderId, OrderOperateType.CREATE, fileIdList);
 
         // order record save
-        orderRecordInit(orderId, OrderOperateType.CREATE, fileIdList, userId);
+        orderRecordInit(orderId, OrderOperateType.CREATE, fileIdList, userId, createDto.getDemo());
         logger.info("订单创建成功，orderId={}, userId={}", orderId, userId);
     }
 
@@ -205,16 +208,30 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
         orderMapper.updateById(orderUpdate);
 
-        List<String> fileIdList = editDto.getAddFileIdList();
+        // delete file
+        List<String> deleteFileIdList = editDto.getDeleteFileIdList();
+        // add file
+        List<String> addFileIdList = editDto.getAddFileIdList();
         // old file
         List<String> oldFileList = findOrderFileIds(editDto.getOrderId());
-        // order document save
-        orderDocumentInit(orderEntity.getOrderId(), OrderOperateType.EDIT, fileIdList);
 
-        fileIdList.addAll(oldFileList);
+        if (deleteFileIdList != null && !deleteFileIdList.isEmpty()) {
+            for (String fileId : deleteFileIdList) {
+                orderDocumentMapper.deleteByFileId(fileId);
+            }
+
+            oldFileList.removeAll(deleteFileIdList);
+        }
+
+        if (addFileIdList != null && !addFileIdList.isEmpty()) {
+            // order document save
+            orderDocumentInit(orderEntity.getOrderId(), OrderOperateType.EDIT, addFileIdList);
+
+            oldFileList.addAll(addFileIdList);
+        }
 
         // order record save
-        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.EDIT, fileIdList, userId);
+        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.EDIT, addFileIdList, userId, editDto.getDemo());
         logger.info("编辑订单成功，orderId={}", editDto.getOrderId());
     }
 
@@ -261,6 +278,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
                 break;
             case 30:
                 dbStatusList.add(OrderStatus.CANCEL.getValue());
+                dbStatusList.add(OrderStatus.AFTER_SALES_CANCEL.getValue());
                 break;
         }
         if (!dbStatusList.isEmpty()) {
@@ -289,6 +307,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderUpdate.setStatus(OrderStatus.INSTALL.getValue());
         orderUpdate.setUpdateTime(now);
         orderUpdate.setInstallTime(now);
+        orderUpdate.setDemo(installDto.getDemo());
         orderMapper.updateById(orderUpdate);
 
         List<String> fileIdList = installDto.getFileIdList();
@@ -301,7 +320,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
         fileIdList.addAll(oldFileList);
         // order record save
-        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.INSTALL, fileIdList, userId);
+        orderRecordInit(orderEntity.getOrderId(), OrderOperateType.INSTALL, fileIdList, userId, installDto.getDemo());
         logger.info("订单安装完成，orderId={}, userId={}", orderEntity.getOrderId(), userId);
     }
 
@@ -327,6 +346,11 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderUpdate.setStatus(OrderStatus.CANCEL.getValue());
         orderMapper.updateById(orderUpdate);
         logger.info("取消订单成功，orderId={}", cancelDto.getOrderId());
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(order.getOrderId());
+        // order record save
+        orderRecordInit(order.getOrderId(), OrderOperateType.CANCEL, oldFileList, userId, cancelDto.getReason());
     }
 
     @Override
@@ -360,14 +384,14 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         // old file
         List<String> oldFileList = findOrderFileIds(order.getOrderId());
 
-        List<String> fileIdList = salesDto.getAddFileIdList();
-
-        // order document save
-        orderDocumentInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CREATE, fileIdList);
-
-        fileIdList.addAll(oldFileList);
+//        List<String> fileIdList = salesDto.getAddFileIdList();
+//
+//        // order document save
+//        orderDocumentInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CREATE, fileIdList);
+//
+//        fileIdList.addAll(oldFileList);
         // order record save
-        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CREATE, fileIdList, userId);
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CREATE, oldFileList, userId, salesDto.getReason());
         logger.info("创建售后完成，orderId={}, userId={}", order.getOrderId(), userId);
 
     }
@@ -409,7 +433,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
         fileIdList.addAll(oldFileList);
         // order record save
-        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_EDIT, fileIdList, userId);
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_EDIT, fileIdList, userId, editDto.getReason());
         logger.info("编辑售后订单完成，orderId={}, userId={}", order.getOrderId(), userId);
     }
 
@@ -443,8 +467,36 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
         fileIdList.addAll(oldFileList);
         // order record save
-        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_FINISH, fileIdList, userId);
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_FINISH, fileIdList, userId, finishDto.getReason());
         logger.info("售后订单处理完成，orderId={}, userId={}", order.getOrderId(), userId);
+    }
+
+    @Override
+    @Transactional
+    public void afterSalesCancel(Long userId, OrderAfterSalesCancelDto cancelDto) throws BusinessDefaultException {
+        OrderEntity order = orderMapper.selectById(cancelDto.getOrderId());
+        if (order == null) {
+            throw new BusinessDefaultException("订单不存在");
+        }
+
+        if (OrderStatus.AFTER_SALES_PENDING.getValue() != order.getStatus()) {
+            throw new BusinessDefaultException("非售后中订单状态，操作失败");
+        }
+
+        Date now = new Date();
+        OrderEntity orderUpdate = new OrderEntity();
+        orderUpdate.setOrderId(order.getOrderId());
+        orderUpdate.setUpdateTime(now);
+        orderUpdate.setAfterSalesReason(cancelDto.getReason());
+        orderMapper.updateById(orderUpdate);
+
+        // old file
+        List<String> oldFileList = findOrderFileIds(order.getOrderId());
+
+        // order record save
+        orderRecordInit(order.getOrderId(), OrderOperateType.AFTER_SALES_CANCEL, oldFileList, userId, cancelDto.getReason());
+        logger.info("取消售后订单完成，orderId={}, userId={}", order.getOrderId(), userId);
+
     }
 
     @Override
@@ -506,12 +558,14 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         List<OrderRecordVo> recordList = Lists.newArrayList();
         LambdaQueryWrapper<OrderRecordEntity> queryRecordWrapper = new LambdaQueryWrapper<>();
         queryRecordWrapper.eq(OrderRecordEntity::getOrderId, orderId);
+        queryRecordWrapper.orderByDesc(OrderRecordEntity::getCreateTime);
         List<OrderRecordEntity> recordEntityList = orderRecordMapper.selectList(queryRecordWrapper);
         if (!recordEntityList.isEmpty()) {
             for (OrderRecordEntity record : recordEntityList) {
                 OrderRecordVo recordVo = new OrderRecordVo();
                 recordVo.setOperator(record.getOperator());
                 recordVo.setOperateTime(CoreDateUtils.formatDateTime(record.getCreateTime()));
+                recordVo.setDemo(record.getDemo());
                 recordVo.setOperateType(OrderOperateType.get(record.getOperateType()).getName());
                 String[] currentIdList = StringUtils.split(record.getCurrentDocumentIds(), ",");
                 recordVo.setCurrentFileIdList(Lists.newArrayList(currentIdList));

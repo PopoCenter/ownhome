@@ -4,9 +4,9 @@ package com.tencent.wxcloudrun.dto;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public class OrderAfterSalesDto {
+public class OrderAfterSalesCancelDto {
 
-    @NotNull(groups = {OrderAfterSalesDto.Verify.class}, message = "orderId不能为空")
+    @NotNull(groups = {OrderAfterSalesCancelDto.Verify.class}, message = "orderId不能为空")
     private Long orderId;
 
     public interface Verify {
@@ -15,18 +15,6 @@ public class OrderAfterSalesDto {
 
     private String reason;
 
-//    private List<String> addFileIdList;
-
-    private String salesVisitTime;
-
-
-    public String getSalesVisitTime() {
-        return salesVisitTime;
-    }
-
-    public void setSalesVisitTime(String salesVisitTime) {
-        this.salesVisitTime = salesVisitTime;
-    }
 
     public Long getOrderId() {
         return orderId;

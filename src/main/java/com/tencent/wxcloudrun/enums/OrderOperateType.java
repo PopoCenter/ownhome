@@ -25,6 +25,7 @@ public enum OrderOperateType {
     AFTER_SALES_CREATE(50, "创建售后订单"),
     AFTER_SALES_EDIT(60, "编辑售后订单"),
     AFTER_SALES_FINISH(70, "已完成售后订单"),
+    AFTER_SALES_CANCEL(80, "已完成售后订单"),
 
 
     ;
