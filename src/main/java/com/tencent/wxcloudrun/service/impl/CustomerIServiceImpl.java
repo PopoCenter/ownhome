@@ -8,6 +8,7 @@ import com.tencent.wxcloudrun.dao.CustomerAddressMapper;
 import com.tencent.wxcloudrun.dao.CustomerMapper;
 import com.tencent.wxcloudrun.dto.CustomerCreateAddressDto;
 import com.tencent.wxcloudrun.dto.CustomerCreateDto;
+import com.tencent.wxcloudrun.dto.CustomerListDto;
 import com.tencent.wxcloudrun.entity.CustomerAddressEntity;
 import com.tencent.wxcloudrun.entity.CustomerEntity;
 import com.tencent.wxcloudrun.entity.TeamEntity;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author dongdongxie
@@ -93,15 +95,38 @@ public class CustomerIServiceImpl extends ServiceImpl<CustomerMapper, CustomerEn
     }
 
     @Override
-    public List<CustomerListVoItem> findByTeamId(Long teamId) throws BusinessDefaultException {
+    public List<CustomerListVoItem> findByTeamId(Long teamId, CustomerListDto queryDto) throws BusinessDefaultException {
         LambdaQueryWrapper<CustomerEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(CustomerEntity::getTeamId, teamId);
+
+        if (queryDto != null) {
+
+            if (queryDto.getPhone() != null && !queryDto.getPhone().isEmpty()) {
+                queryWrapper.like(CustomerEntity::getPhone, queryDto.getPhone());
+            }
+
+            if (queryDto.getName() != null && !queryDto.getName().isEmpty()) {
+                queryWrapper.like(CustomerEntity::getName, queryDto.getName());
+            }
+
+            if (queryDto.getAddress() != null && !queryDto.getAddress().isEmpty()) {
+                LambdaQueryWrapper<CustomerAddressEntity> queryAddressWrapper = new LambdaQueryWrapper<>();
+                queryAddressWrapper.like(CustomerAddressEntity::getAddress, queryDto.getAddress());
+
+                List<CustomerAddressEntity> addressList = customerAddressMapper.selectList(queryAddressWrapper);
+                if (!addressList.isEmpty()) {
+                    List<Long> customerIds = addressList.stream().map(CustomerAddressEntity::getId).collect(Collectors.toList());
+                    queryWrapper.in(CustomerEntity::getCustomerId, customerIds);
+                }
+            }
+        }
 
         List<CustomerListVoItem> customerList = Lists.newArrayList();
         List<CustomerEntity> dbList = customerMapper.selectList(queryWrapper);
         if (dbList.isEmpty()) {
             return customerList;
         }
+
 
         for (CustomerEntity customer : dbList) {
             CustomerListVoItem item = new CustomerListVoItem();

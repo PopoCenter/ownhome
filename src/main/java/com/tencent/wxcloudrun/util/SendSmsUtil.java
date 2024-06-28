@@ -21,26 +21,26 @@ public class SendSmsUtil {
 
 
 
-    public static void main(String[] args) {
-        SendSmsRequest request = new SendSmsRequest();
-        request.setPhone("15210235657");
-
-        request.setSmsSdkAppId("1400788564");
-
-        request.setSecretId("");
-        request.setSecretKey("");
-
-        request.setSignName("蓝图数字化工具");
-        request.setTemplateId("1662625");
-        // 这个值，要看你的模板中是否预留了占位符，如果没有则不需要设置
-        request.setTemplateParamSet(new String[]{"模板中的参数值，如果没有则为空"});
-        SendSmsUtil.sendSms(request);
-    }
+//    public static void main(String[] args) {
+//        SendSmsRequest request = new SendSmsRequest();
+//        request.setPhone("15210235657");
+//
+//        request.setSmsSdkAppId("1400788564");
+//
+//        request.setSecretId("");
+//        request.setSecretKey("");
+//
+//        request.setSignName("蓝图数字化工具");
+//        request.setTemplateId("1662625");
+//        // 这个值，要看你的模板中是否预留了占位符，如果没有则不需要设置
+//        request.setTemplateParamSet(new String[]{"模板中的参数值，如果没有则为空"});
+//        SendSmsUtil.sendSms(request);
+//    }
 
         public static Boolean sendSms(SendSmsRequest request) {
             Credential cred = new Credential(request.getSecretId(), request.getSecretKey());
 
-            SmsClient client = new SmsClient(cred, "ap-shanghai");
+            SmsClient client = new SmsClient(cred, "ap-guangzhou");
 
             final var req = new com.tencentcloudapi.sms.v20210111.models.SendSmsRequest();
             req.setPhoneNumberSet(new String[]{"+86" + request.getPhone()});
@@ -56,7 +56,7 @@ public class SendSmsUtil {
                 log.error("发送短信出错：", e);
                 return Boolean.FALSE;
             }
-            log.error("发送短信结果：", SendSmsResponse.toJsonString(res));
+            log.info("发送短信结果 response={}", SendSmsResponse.toJsonString(res));
 
             if (Objects.nonNull(res.getSendStatusSet()) && res.getSendStatusSet().length > 0 && "Ok".equals(res.getSendStatusSet()[0].getCode())){
                 return Boolean.TRUE;

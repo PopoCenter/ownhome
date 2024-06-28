@@ -16,6 +16,15 @@ public class OrderListDto extends PageDTO {
      */
     private String name;
 
+
+
+    private String phone;
+
+
+    private String address;
+
+
+
     /**
      * -1 全部 10 待处理 20 处理完成 30 已取消
      */
@@ -41,5 +50,21 @@ public class OrderListDto extends PageDTO {
 
     public void setQueryStatus(Integer queryStatus) {
         this.queryStatus = queryStatus;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

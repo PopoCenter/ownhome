@@ -3,6 +3,7 @@ package com.tencent.wxcloudrun.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
 import com.tencent.wxcloudrun.dto.CustomerCreateDto;
+import com.tencent.wxcloudrun.dto.CustomerListDto;
 import com.tencent.wxcloudrun.dto.RegisterDto;
 import com.tencent.wxcloudrun.entity.CustomerAddressEntity;
 import com.tencent.wxcloudrun.entity.CustomerEntity;
@@ -29,7 +30,7 @@ public interface CustomerIService extends IService<CustomerEntity> {
      * @return
      * @throws BusinessDefaultException
      */
-    List<CustomerListVoItem> findByTeamId(Long teamId) throws BusinessDefaultException;
+    List<CustomerListVoItem> findByTeamId(Long teamId, CustomerListDto queryDto) throws BusinessDefaultException;
 
     /**
      * 查询

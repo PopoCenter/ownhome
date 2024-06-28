@@ -16,6 +16,10 @@ spring:
 mybatis:
   mapper-locations: classpath*:mapper/*Mapper.xml
 
+sms:
+  secretId: ${SECRETID}
+  secretKey: ${SECRETKEY}
+
 
 #
 #server:
@@ -35,3 +39,5 @@ mybatis:
 #
 #mybatis:
 #  mapper-locations: classpath*:mapper/*Mapper.xml
+#
+

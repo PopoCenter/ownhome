@@ -266,6 +266,16 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
             queryWrapper.like(OrderEntity::getCustomerName, name);
         }
 
+        String phone = listDto.getPhone();
+        if (StringUtils.isNotEmpty(phone)) {
+            queryWrapper.like(OrderEntity::getCustomerPhone, phone);
+        }
+
+        String address = listDto.getAddress();
+        if (StringUtils.isNotEmpty(address)) {
+            queryWrapper.like(OrderEntity::getAddress, address);
+        }
+
         List<Integer> dbStatusList = Lists.newArrayList();
         switch (queryStatus) {
             case 10:
@@ -366,7 +376,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         }
 
 
-        Date visitTime = CoreDateUtils.parseDateTime(salesDto.getSalesVisitTime());
+        Date visitTime = CoreDateUtils.parseDate(salesDto.getSalesVisitTime());
         if (visitTime == null) {
             throw new BusinessDefaultException("预约时间格式不正确");
         }
@@ -540,7 +550,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         detailVo.setLongitude(order.getLongitude());
         detailVo.setOrderDemo(order.getDemo());
         detailVo.setInviteTime(CoreDateUtils.formatDate(order.getVisitTime()));
-        detailVo.setAfterSalesTime(order.getAfterSalesTime() == null ? StringUtils.EMPTY : CoreDateUtils.formatDateTime(order.getAfterSalesTime()));
+        detailVo.setAfterSalesTime(order.getAfterSalesTime() == null ? StringUtils.EMPTY : CoreDateUtils.formatDate(order.getAfterSalesTime()));
         detailVo.setCustomerAddressId(order.getAddressId());
 
         CustomerEntity customerEntity = customerMapper.selectById(order.getCustomerId());

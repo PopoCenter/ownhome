@@ -69,7 +69,7 @@ public class CustomerController extends BaseController {
      * 客户列表
      */
     @PostMapping(value = "/list")
-    ResponseMessage<CustomerListVo> list(@RequestHeader HttpHeaders headers) {
+    ResponseMessage<CustomerListVo> list(@RequestHeader HttpHeaders headers, @RequestBody CustomerListDto queryDto) {
         try {
             String openId = getOpenId(headers);
             UserEntity userEntity = userIService.findByOpenId(openId);
@@ -84,7 +84,7 @@ public class CustomerController extends BaseController {
             List<CustomerListVoItem> customerList = Lists.newArrayList();
             TeamEntity teamEntity = teamIService.findByUserId(userEntity.getUserId());
             if (teamEntity != null) {
-                customerList = customerIService.findByTeamId(teamEntity.getTeamId());
+                customerList = customerIService.findByTeamId(teamEntity.getTeamId(), queryDto);
             }
 
             if (customerList.isEmpty()) {

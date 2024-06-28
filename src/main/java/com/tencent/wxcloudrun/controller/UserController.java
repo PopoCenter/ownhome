@@ -19,6 +19,7 @@ import com.tencent.wxcloudrun.util.SendSmsUtil;
 import com.tencent.wxcloudrun.vo.UserInfoVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +41,12 @@ public class UserController extends BaseController {
     @Autowired
     private TeamIService teamIService;
 
+    @Value("${sms.secretId}")
+    private String secretId;
+
+    @Value("${sms.secretKey}")
+    private String secretKey;
+
 
     private Cache<String, String> codeCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
@@ -59,20 +66,21 @@ public class UserController extends BaseController {
 
             request.setSmsSdkAppId("1400788564");
 
-            request.setSecretId("");
-            request.setSecretKey("");
+            request.setSecretId(secretId);
+            request.setSecretKey(secretKey);
 
-            request.setSignName("蓝图数字化工具");
+            request.setSignName("奇思科技空间公众号");
             request.setTemplateId("1662625");
-            // 这个值，要看你的模板中是否预留了占位符，如果没有则不需要设置
-            request.setTemplateParamSet(new String[]{"模板中的参数值，如果没有则为空"});
 
-            //SendSmsUtil.sendSms(request);
-
-            Random random = new Random();
-            //int code = random.nextInt(999999) + 100000; // 生成一个六位数的随机数，从100000到999999
 
             String code = CoreStringUtils.generateRandomCode(6);
+
+
+            // 这个值，要看你的模板中是否预留了占位符，如果没有则不需要设置
+            request.setTemplateParamSet(new String[]{code});
+
+            SendSmsUtil.sendSms(request);
+
 
             //缓存5分钟 5分钟后失效
 
