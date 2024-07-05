@@ -376,7 +376,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
             throw new BusinessDefaultException("订单不存在");
         }
 
-        if (OrderStatus.INSTALL.getValue() != order.getStatus()) {
+        if (OrderStatus.AFTER_SALES_INSTALL.getValue() != order.getStatus() || OrderStatus.INSTALL.getValue() != order.getStatus()) {
             throw new BusinessDefaultException("非已完成订单状态，操作失败");
         }
 
