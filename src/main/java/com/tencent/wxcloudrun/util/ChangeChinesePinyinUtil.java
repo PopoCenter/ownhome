@@ -18,7 +18,12 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ChangeChinesePinyinUtil {
+
+
     /**
      * 获取姓名全拼和首字母
      * @author 于公成
@@ -39,29 +44,31 @@ public class ChangeChinesePinyinUtil {
         StringBuffer firstPinyin = new StringBuffer();
 
         char[] chineseChar = chinese.toCharArray();
-        for (int i = 0; i < chineseChar.length; i++) {
-            String[] str = null;
-            try {
-                str = PinyinHelper.toHanyuPinyinStringArray(chineseChar[i],
-                        format);
-            } catch (BadHanyuPinyinOutputFormatCombination e) {
-                e.printStackTrace();
-            }
-            if (str != null) {
-                fullPinyin = fullPinyin.append(str[0].toString());
-                simplePinyin = simplePinyin.append(str[0].charAt(0));
-
-            }
-            if (str == null) {
-                String regex = "^[0-9]*[a-zA-Z]*+$";
-                Pattern pattern = Pattern.compile(regex);
-                Matcher m = pattern.matcher(String.valueOf(chineseChar[i]));
-                if (m.find()) {
-                    fullPinyin = fullPinyin.append(chineseChar[i]);
-                    simplePinyin = simplePinyin.append(chineseChar[i]);
-                }
-            }
-        }
+//        for (int i = 0; i < chineseChar.length; i++) {
+//            String[] str = null;
+//            try {
+//                str = PinyinHelper.toHanyuPinyinStringArray(chineseChar[i],
+//                        format);
+//            } catch (BadHanyuPinyinOutputFormatCombination e) {
+//                System.out.println(e.getMessage());
+//                System.out.println("tag");
+//                e.printStackTrace();
+//            }
+//            if (str != null) {
+//                fullPinyin = fullPinyin.append(str[0].toString());
+//                simplePinyin = simplePinyin.append(str[0].charAt(0));
+//
+//            }
+//            if (str == null) {
+//                String regex = "^[0-9]*[a-zA-Z]*+$";
+//                Pattern pattern = Pattern.compile(regex);
+//                Matcher m = pattern.matcher(String.valueOf(chineseChar[i]));
+//                if (m.find()) {
+//                    fullPinyin = fullPinyin.append(chineseChar[i]);
+//                    simplePinyin = simplePinyin.append(chineseChar[i]);
+//                }
+//            }
+//        }
         String[] name = PinyinHelper.toHanyuPinyinStringArray(chineseChar[0],format);
         firstPinyin=firstPinyin.append(name[0].charAt(0));
         pinyin.put("fullPinyin", fullPinyin.toString());

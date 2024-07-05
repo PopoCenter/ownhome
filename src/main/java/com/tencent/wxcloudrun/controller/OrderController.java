@@ -6,6 +6,7 @@ import com.tencent.wxcloudrun.Exception.BusinessDefaultException;
 import com.tencent.wxcloudrun.config.ResponseMessage;
 import com.tencent.wxcloudrun.dto.*;
 import com.tencent.wxcloudrun.entity.OrderEntity;
+import com.tencent.wxcloudrun.entity.TeamEntity;
 import com.tencent.wxcloudrun.entity.UserEntity;
 import com.tencent.wxcloudrun.enums.OrderStatus;
 import com.tencent.wxcloudrun.enums.ResponseEnum;
@@ -37,6 +38,9 @@ public class OrderController extends BaseController {
     @Autowired
     private OrderIService orderIService;
 
+    @Autowired
+    private TeamIService teamIService;
+
     /**
      * 创建订单
      */
@@ -49,7 +53,12 @@ public class OrderController extends BaseController {
                 return ResponseMessage.fail(ResponseEnum.USER_NOT_EXIST, "用户不存在");
             }
 
-            orderIService.create(userEntity.getUserId(), createDto);
+            TeamEntity teamEntity = teamIService.findByUserId(userEntity.getUserId());
+            if (teamEntity == null) {
+                throw new BusinessDefaultException("团队不存在");
+            }
+
+            orderIService.create(userEntity.getUserId(), teamEntity.getTeamId(), createDto);
             return ResponseMessage.success();
         } catch (BusinessDefaultException ue) {
             logger.error(ue.getMessage(), ue);
@@ -120,10 +129,15 @@ public class OrderController extends BaseController {
                 return ResponseMessage.fail(ResponseEnum.USER_NOT_EXIST, "用户不存在");
             }
 
+            TeamEntity teamEntity = teamIService.findByUserId(userEntity.getUserId());
+            if (teamEntity == null) {
+                throw new BusinessDefaultException("团队不存在");
+            }
+
             OrderListVo listVo = new OrderListVo();
             List<OrderListItemVo> orderList = Lists.newArrayList();
 
-            Page<OrderEntity> orderPage = orderIService.list(userEntity.getUserId(), listDto);
+            Page<OrderEntity> orderPage = orderIService.list(userEntity.getUserId(), teamEntity.getTeamId(), listDto);
             for (OrderEntity order : orderPage.getRecords()) {
                 OrderListItemVo itemVo = new OrderListItemVo();
                 itemVo.setOrderId(order.getOrderId());

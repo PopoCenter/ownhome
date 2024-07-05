@@ -28,7 +28,7 @@ public interface OrderIService extends IService<OrderEntity> {
      * @param createDto
      * @throws BusinessDefaultException
      */
-    void create(Long userId, OrderCreateDto createDto) throws BusinessDefaultException;
+    void create(Long userId, Long teamId, OrderCreateDto createDto) throws BusinessDefaultException;
 
 
     /**
@@ -49,7 +49,7 @@ public interface OrderIService extends IService<OrderEntity> {
      * @return
      * @throws BusinessDefaultException
      */
-    Page<OrderEntity> list(Long userId, OrderListDto listDto) throws BusinessDefaultException;
+    Page<OrderEntity> list(Long userId, Long teamId, OrderListDto listDto) throws BusinessDefaultException;
 
 
     /**

@@ -26,6 +26,12 @@ public class OrderEntity {
     /**
      * 创建人id
      */
+    private Long teamId;
+
+
+    /**
+     * 创建人id
+     */
     private Long ownerId;
 
     /**
@@ -315,5 +321,13 @@ public class OrderEntity {
 
     public void setGenderType(Integer genderType) {
         this.genderType = genderType;
+    }
+
+    public Long getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(Long teamId) {
+        this.teamId = teamId;
     }
 }

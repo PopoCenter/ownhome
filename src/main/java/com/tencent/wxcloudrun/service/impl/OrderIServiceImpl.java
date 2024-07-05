@@ -100,7 +100,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
     @Override
     @Transactional
-    public void create(Long userId, OrderCreateDto createDto) throws BusinessDefaultException {
+    public void create(Long userId, Long teamId, OrderCreateDto createDto) throws BusinessDefaultException {
         UserEntity user = userMapper.selectById(userId);
         if (user == null) {
             throw new BusinessDefaultException("用户不存在");
@@ -130,6 +130,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         OrderEntity order = new OrderEntity();
         Long orderId = UniqueIdUtils.Millis.uniqueId();
         order.setOrderId(orderId);
+        order.setTeamId(teamId);
         order.setOwnerId(userId);
         order.setOwnerName(user.getName());
         order.setCustomerId(customer.getCustomerId());
@@ -250,7 +251,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
 
 
     @Override
-    public Page<OrderEntity> list(Long userId, OrderListDto listDto) throws BusinessDefaultException {
+    public Page<OrderEntity> list(Long userId, Long teamId, OrderListDto listDto) throws BusinessDefaultException {
         Integer queryStatus = listDto.getQueryStatus();
         List<Integer> checkList = Lists.newArrayList(-1, 10, 20, 30);
         if (!checkList.contains(queryStatus)) {
@@ -260,6 +261,10 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         Page<OrderEntity> page = Page.of(listDto.getPageNum(), listDto.getPageSize());
 
         LambdaQueryWrapper<OrderEntity> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.eq(OrderEntity::getTeamId, teamId);
+
+
         // 客户名称模糊搜索
         String name = listDto.getName();
         if (StringUtils.isNotEmpty(name)) {
@@ -499,7 +504,7 @@ public class OrderIServiceImpl extends ServiceImpl<OrderMapper, OrderEntity> imp
         orderUpdate.setOrderId(order.getOrderId());
         orderUpdate.setUpdateTime(now);
         orderUpdate.setAfterSalesReason(cancelDto.getReason());
-        orderUpdate.setStatus(OrderStatus.AFTER_SALES_CANCEL.getValue());
+        orderUpdate.setStatus(OrderStatus.INSTALL.getValue());
         orderMapper.updateById(orderUpdate);
 
         // old file
