@@ -187,7 +187,7 @@ public class TeamIServiceImpl extends ServiceImpl<TeamMapper, TeamEntity> implem
         teamMapper.deleteById(memberEntity.getTeamId());
 
         LambdaQueryWrapper<TeamMemberEntity> updateWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(TeamMemberEntity::getTeamId, memberEntity.getTeamId());
+        updateWrapper.eq(TeamMemberEntity::getTeamId, memberEntity.getTeamId());
         teamMemberMapper.delete(updateWrapper);
 
         logger.info("解散团队成功，userId={}", userId);
