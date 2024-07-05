@@ -115,7 +115,7 @@ public class CustomerIServiceImpl extends ServiceImpl<CustomerMapper, CustomerEn
 
                 List<CustomerAddressEntity> addressList = customerAddressMapper.selectList(queryAddressWrapper);
                 if (!addressList.isEmpty()) {
-                    List<Long> customerIds = addressList.stream().map(CustomerAddressEntity::getId).collect(Collectors.toList());
+                    List<Long> customerIds = addressList.stream().map(CustomerAddressEntity::getCustomerId).collect(Collectors.toList());
                     queryWrapper.in(CustomerEntity::getCustomerId, customerIds);
                 }
             }
